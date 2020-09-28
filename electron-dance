@@ -1,0 +1,85 @@
+#!/bin/env python3
+
+import getopt
+import sys
+
+# Command line arguments.
+args = sys.argv[1:]  # Ignore script filename.
+optlist = getopt.getopt(args, 'n:m:isphg', ['num-electrons=', 'max-steps=', 'images', 'save-state', 'plot', 'help', 'gif'])[0]
+help_string = """
+Usage: electron-dance [OPTIONS]
+Simulaties specified number of electrons settling into their equillibrium
+position on a square conductor.
+
+Arguments:
+  -h, --help              Prints this help message.
+  -n, --num-electrons=    How many electrons do you want to simulate?
+  -m, --max-steps=        Cuts the simulation short when it reaches specified
+                          number of steps.
+  -i, --images            If set, saves images of simulation at each time step.
+  -s, --save-state        Saves the coordinates of equillibrium state for
+                          further analysis.
+  -p, --plot              Plots starting and equillibrium states.
+  -g, --gif               Creates a gif of simulation. Also stores images.
+"""
+
+# Defaults.
+no_electrons = 1
+max_steps = 600
+store_images = False
+save_state = False
+create_plots = False
+create_gif = False
+bool_help = False
+
+try:
+    for optarg in optlist:
+        if optarg[0] == '-n' or optarg[0] == '--num-electrons':
+            no_electrons = int(optarg[1])
+        elif optarg[0] == '-m' or optarg[0] == '--max-steps':
+            max_steps = int(optarg[1])
+        elif optarg[0] == '-i' or optarg[0] == '--images':
+            store_images = True
+        elif optarg[0] == '-s' or optarg[0] == '--save-state':
+            save_state = True
+        elif optarg[0] == '-p' or optarg[0] == '--plot':
+            create_plots = True
+        elif optarg[0] == '-g' or optarg[0] == '--gif':
+            create_gif = True
+            store_images = True
+        elif optarg[0] == '-h' or optarg[0] == '--help':
+            print(help_string)
+            bool_help = True
+except:
+    # No exceptions here, because we like to play it risky.
+    print("I guess you did not enter integer values where you had to.")
+    print("Try again, but this time pay more attention, please.")
+    print("num-electrons and max-steps should be integers!")
+    exit()  # Force exit.
+
+if bool_help:  # Force quit if user asked for help.
+    exit()
+
+print("Starting simulation.")
+import simulation  # Time optimization.
+equillibrium_state, starting_state = simulation.run_simulation(no_electrons, max_steps, store_images)
+print("Simulation done.")
+
+# Time optimization.
+if create_plots or save_state:
+    import helpers
+
+# Plot the state.
+if create_plots:
+    helpers.plot_electrons(starting_state, equillibrium_state)
+
+# Store equillibrium state.
+if save_state:
+    helpers.store_state(equillibrium_state)
+
+if create_gif:
+    print("Creating .gif file")
+    import os  # Time optimization.
+    os.system("mkdir -p ./data/gifs")
+    # This part depends on 'imagemagick'.
+    os.system("convert -delay 4 -loop 0 ./data/stored-states/{0}-electrons/images/*.png ./data/gifs/dance-{0}.gif".format(no_electrons))
