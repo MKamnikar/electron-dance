@@ -10,7 +10,12 @@ Specify the number of particles with option `-n` or `--num-electrons=`.
 It is possible to save images of each simulation step to later analyze or just to create neat .gifs.
 To save the images, pass the option `-i` or `--images` to the program.
 
-It is also possible to create .gif from the images with the option `-g` or `--gif`. This part depends on `imagemagick`.
+It is also possible to create .gif from the images with the option `-g` or `--gif`. This part depends on `imagemagick`. If you
+already ran the simulation and saved its images, you can cd into its images directory and run
+
+```
+$ convert -delay 4 -loop 0 *.png ../../../gifs/dance.gif
+```
 
 ![Simulation of 11 electrons](data/gifs/dance-11.gif)
 
