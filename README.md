@@ -12,5 +12,7 @@ To save the images, pass the option `-i` or `--images` to the program.
 
 It is also possible to create .gif from the images with the option `-g` or `--gif`. This part depends on `imagemagick`.
 
+![Simulation of 11 electrons](data/gifs/dance-11.gif)
+
 Option `-s` will save the last step in a simulation (equillibrium state if the simulation ran for long enough) to a file
 for further analysis later.
