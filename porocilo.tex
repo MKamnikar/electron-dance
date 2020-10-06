@@ -1,0 +1,190 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[round]{natbib}
+\usepackage{url}
+\usepackage{xspace}
+\usepackage[left=25mm,top=23mm, right=25mm]{geometry}
+\usepackage{algorithmic}
+\usepackage{subcaption}
+\usepackage{mathpazo}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\title{Doma\v ca naloga iz matemati\v cne fizike}
+\author{Maks Kamnikar}
+% \date{\today}
+
+\begin{document}
+    \maketitle
+
+    % Uvod: Naloga
+    \textbf{Naloga:}
+    \newline
+    \v Stiri enako dolge ravne prevodne nano-\v zi\v cke staknemo v kvadraten okvir in nanj
+    nanesemo nekaj elektronov.
+    \newline
+    Kako se razporedijo?
+    \newline
+    Kak\v sno je elektri\v cno polje okvira?
+    \newline
+    Ali limitira s \v stevilom elektronov k stalni obliki?
+
+
+    \vspace{30pt}
+    % Uvod
+    Moja naloga je poiskati optimalno razporeditev elektronov na kvadratnem okvirju.
+    To je tak\v sna razporeditev, pri kateri je skupna potencialna energija sistema elektronov
+    najmanj\v sa.
+
+    \vspace{30pt}
+    Za potencialno energijo i-tega elektrona v polju j-tega elektrona velja sorazmernost
+    $$ W_{i,j} \propto \frac{1}{\left\vert\mathbf{r}_{i} - \mathbf{r}_{j}\right\vert}. $$
+
+    \noindent
+    Torej je potencialna energija i-tega elektrona v polju vseh ostalih elektronov
+    $$ W_{i} = \sum_{j \neq i} W_{i,j}. $$
+
+    \noindent
+    I\v s\v cem razporeditev elektronov pri kateri bo vsota vseh njihovih potencialnih energij
+    $$ W = \sum_{i} W_{i} \propto \sum_{i} \sum_{j \neq i} \frac{1}{\left\vert\mathbf{r}_{i} - \mathbf{r}_{j}\right\vert} $$
+    najmanj\v sa.
+
+    \vspace{10pt}
+    Elektron na kvadratnem nosilcu je v lokalnem minimumu potenciala, ko nanj deluje sila,
+    ki ima neni\v celno kve\v cjemu komponento pravokotno na nosilec, in elektrona ne potiska
+    vzdol\v z nosilca.
+    Sila j-tega elektrona na i-ti elektron vzdol\v z stranice na kateri le\v zi i-ti elektron je
+    $$ F_{i,j} =\mathbf{F}_{i,j} \cdot \hat{\mathbf{a}}_i= \frac{e_{0} ^ 2}{4 \pi \varepsilon_{0} \left\vert \mathbf{r}_{i} -
+    \mathbf{r}_{j} \right\vert ^2}
+    \frac{\mathbf{r}_{i} - \mathbf{r}_{j}}{\left\vert \mathbf{r}_{i} - \mathbf{r}_{j} \right\vert} \cdot \hat{\mathbf{a}}_i
+    \propto \frac{\cos \varphi_{i,j}}{\left\vert \mathbf{r}_{i} -
+    \mathbf{r}_{j} \right\vert^3} , $$
+
+    \noindent
+    kjer je $\hat{\mathbf{a}}_i$ enotski vektor vzporeden s stranico na kateri le\v zi i-ti elektron, $\varphi_{i,j}$ pa kot med
+    vektorjema $ \mathbf{r}_{i} - \mathbf{r}_{j}$ in $\hat{\mathbf{a}}_i$. Oziroma
+
+    $$ F_{i, j} \propto \frac{\Delta y}{(\Delta x_{i,j} ^2 + \Delta y_{i,j} ^2)^2} , $$
+
+    \noindent
+    kjer je $\Delta x_{i,j} ^2 + \Delta y_{i,j} ^2 = \left\vert \mathbf{r}_{i} - \mathbf{r}_{j} \right\vert ^2 = (x_i - x_j)^2
+    + (y_i - y_j) ^2$, $\cos{\varphi_{i,j}} = \frac{\Delta y}{\sqrt{\Delta x_{i,j} ^2 + \Delta y_{i,j} ^2}}$.
+
+
+    \noindent
+    Iskal sem tako razporeditev elektronov po okvirju, da velja neenakost
+    $$F_i = \sum_{j \neq i} F_{i,j} \leq \varepsilon $$
+
+    \noindent
+    za vsak $i = 1, 2, ..., n$, kjer je $n$ \v stevilo elektronov na okvirju in $\varepsilon > 0, \varepsilon \ll 1$.
+
+
+    % Jedro
+    \vspace{10pt}
+    To razporeditev sem iskal tako, da sem simuliral $n$ elektronov na kvadratnem okvirju, pri \v cemer
+    sem premikal elektrone vzdol\v z stranic okvirja v smeri rezultante sil nanje. Simulacijo sem kon\v cal, ko
+    so bile sile na elektrone s komponento vzdol\v z stranic dovolj majhne za \v zeleno numeri\v cno natan\v cnost
+    ($ F_i \leq \varepsilon $),
+    oz. ko sta si bili stanji dveh zaporednih korakov simulacije dovolj podobni.
+
+    \vspace{10pt}
+    Da bi s simulacijo na\v sel le stabilna ravnovesna stanja, sem sistem, ko je pristal v morebitnem labilnem stanju
+    izmaknil iz njega in preveril, da se ravnovesje spet vzpostavi v istih to\v ckah. To sem storil tako,
+    da sem vsakemu delcu, ki ni le\v zal v ogli\v s\v cu kvadratnega nosilca, naklju\v cno spremenil
+    pozicijo vzdol\v z stranice na kateri je le\v zal. Psevdonaklju\v cna Pythonova knji\v znica \texttt{random}, ki sem
+    jo uporabljal, je dovolj naklju\v cna za ta namen, saj je verjetnost, da bi sistem s to perturbacijo ponesre\v ci
+    premaknil ravno v neko drugo labilno stanje, zanemarljiva. Stabilno ravnovesno stanje ni eno, ampak zaradi simetrije
+    obstaja 8 stabilnih, energetsko enakovrednih, optimalnih stanj. 4 zaradi zrcaljenj in 4 zaradi rotacij.
+
+    % \begin{center}
+    %     % \includegraphics[scale=0.5]{{Figure_1.pdf}}
+    %     \includegraphics[width=\textwidth]{{Figure_1.pdf}}
+    % \end{center}
+
+    \begin{figure}[h!]
+        % \includegraphics[scale=0.45]{{Figure_1.pdf}}
+        \includegraphics[width=\textwidth]{{Figure_1.pdf}}
+        \begin{center}
+            \textbf{Slika 1}: Primeri razli\v cnih stabilnih in labilnih ravnovesij.
+        \end{center}
+    \end{figure}
+
+    Slika 1.1 in 1.2 prikazujeta dve distribuciji dvajsetih elektronov, ki sta obe stabilni, kljub temu pa obe nimata iste
+    potencialne energije. Najni\v zje energije imajo sistemi z delci v ogli\v s\v cih kvadratnega nosilca, saj
+    imajo tako ve\v cje medsebojne razdalje. Slika 1.3 prikazuje stabilno ravnovesno stanje za \v stiri delce, Slika 1.4
+    pa labilno stanje sistema \v stirih elektronov.
+
+    \vspace{10pt}
+    Zanimala so me stanja z minimalno energijo, se pravi tista, ki imajo \v cimve\v c delcev v ogli\v s\v cih kvadrata.
+    Da sem zagotovil, da se bo sistem res zna\v sel v takem stanju, sem elektrone pred za\v cetkom simulacije nanesel
+    na kvadratni okvir tako, da sem vsaj en elektron vedno postavil v eno od ogli\v s\v c; razporedil sem jih enakomerno
+    po polarnem kotu za\v cen\v si s kotom $\frac{\pi}{4}$. Polarni kot i-tega elektrona $\theta_i$ v sistemu $n$
+    elektronov je torej
+
+    $$ \theta_i = \frac{2 \pi}{n} (i - 1) + \frac{\pi}{4} .$$
+
+    \vspace{10pt}
+    Zdaj so elektroni na\v sli svoje ravnovesne polo\v zaje, mi pa se spra\v sujemo, \v ce je kaj zanimivega v elektri\v cnem polju
+    okoli teh elektronov. Vemo da je sila na i-ti elektron $\mathbf{F}_i = \mathbf{E} e_0$, prav tako pa zaradi ravnovesnega
+    pogoja dr\v zi $F_i \leq \varepsilon \ll 1$. Torej je komponenta sile na i-ti elektron vzdol\v z stranice na kateri le\v zi
+    zanemarljiva. Posledica tega je, da je neni\v celna lahko kve\v cjemu komponenta sile pravokotna na stranico kvadrata.
+    Torej so silnice elektri\v cnega polja v to\v cki vsakega elektrona usmerjene ven iz kvadrata, normalno na njegove stranice.
+
+    \begin{figure}[h!]
+        % \includegraphics[scale=0.45]{{Figure_1.pdf}}
+        \includegraphics[width=\textwidth]{{Figure_2-cc.pdf}}
+        \begin{center}
+            \textbf{Slika 2}: Silnice elektri\v cnega polja sistema stotih elektronov in njegove ekvipotencialne ploskve.
+        \end{center}
+    \end{figure}
+
+    Na Sliki 2.1 vidimo, da nas teorija ni pustila na cedilu in, da so silnice polja res normalne na stranice kvadrata.
+    Silnice prebadajo ekvipotencialne ploskve pravokotno ($\mathbf{E} = -\nabla V $), zato lahko iz Slike 2.2 potrdimo kar smo ugotovili iz Slike 2.1.
+    Seveda so silnice normalne na stranico kvadrata le v tistih to\v ckah, kjer le\v zi elektron, v limiti zvezno
+    porazporejenega naboja pa to velja za vsako to\v cko na kvadratnem okvirju.
+
+    \vspace{10pt}
+    Trditev, da silnice elektri\v cnega polja prebadajo stranice oz. izvirajo iz stranic kvadratnega okvirja normalno nanj, velja le
+    v limiti neskon\v cno elektronov oziroma kadar je po prevodniku naboj razporejen zvezno. Za veliko \v stevilo elektronov na
+    okvirju \v se kar dobro velja, da so silnice pravokotne na okvir, za majhno \v stevilo delcev pa ta trditev obupno odpove.
+
+    \begin{center}
+    \includegraphics[width=\textwidth]{{Figure_3-cc.pdf}}
+    \textbf{Slika 3}: Silnice elektri\v cnega polja sistema petih elektronov in njegove ekvipotencialne ploskve.
+    \end{center}
+
+    Na Sliki 3.1 jasno vidimo, da silnice elektri\v cnega polja ne prebadajo stranic kvadrata pod pravim kotom. Iz Slike 3.2
+    pa opazimo, da ekvipotencialne ploskve niso niti pribli\v zno vzporedne stranicam kvadrata.
+
+    \begin{center}
+    \includegraphics[width=\textwidth]{{Figure_4-cc.pdf}}
+    \textbf{Slika 4}: Silnice elektri\v cnih polj razli\v cno \v stevil\v cnih sistemov.
+    \end{center}
+
+    Na Sliki 4 vidimo, da elektri\v cno polje okvira res limitira k neki funkciji z nara\v s\v cajo\v cim \v stevilom elektronov,
+    saj sta Sliki 4.3 in 4.4 skoraj enaki.
+    \v Ce imamo v sistemu le 20 elektronov, kot jih imamo v Sliki 4.1, je o\v citno, da elektri\v cno polje ni povsod  pravokotno
+    na kvadratni okvir, pri sistemu z 80 elektroni pa to \v ze kar dobro dr\v zi.
+
+    \vspace{10pt}
+    Ena on bistvenih pomankljivosti grafov, kjer na okvir gledamo v tlorisu, je ta, da ne vidimo kaj se dogaja s silnicami
+    v smeri normalni na ploskev kvadrata. Na prvi pogled izgleda kot, da bi bil v sredi\v s\v cu kvadrata pozitiven naboj
+    iz katerega izvirajo silnice, ki so usmerjene proti stranicam. Seveda temu ni tako. Te silnice izvirajo iz neskon\v cnosti
+    nad in pod ravnino kvadrata, vendar zaradi projekcije na dvodimenzionalen graf izgleda kot, da se v sredi\v s\v cu kvadrata
+    skriva nek pozitiven naboj.
+
+    \begin{center}
+    \includegraphics[width=1\linewidth]{Figure_5.pdf}
+    \textbf{Slika 5}: Silnice elektri\v cnega polja sistema stotih elektronov.
+    \end{center}
+
+    Na Sliki 5 vidimo, kak\v sno je elektri\v cno polje okvira nad in pod njim. O\v citno je, da v sredi\v s\v cu kvadrata
+    ni nobenih nabitih delcev. Seveda se polje \v siri nesko\v cno v vse smeri, vendar je na sliki zaradi preglednosti narisan le
+    ozek centralni del.
+
+
+\end{document}
