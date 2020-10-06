@@ -1,0 +1,266 @@
+#!/bin/env python3
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import getopt
+import sys
+
+# Make it look like LaTeX.
+from matplotlib import rc
+rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman']})
+rc('text', usetex=True)
+
+# Command line arguments.
+args = sys.argv[1:]  # Ignore script filename.
+optlist = getopt.getopt(args, 'n:I:C:32csSBh',
+                        ['num-electrons=',
+                         'file=',
+                         'color=',
+                         '3d',
+                         '2d',
+                         'contour',
+                         'streamplot',
+                         'no-square',
+                         'big',
+                         'help'])[0]
+help_string = """
+Usage: draw-plots --num-electrons=[NUMBER] [OPTIONS]
+Draws different kinds of plots using coordinates of electrons
+as input data.
+
+Arguments:
+  -h, --help              Prints this help message.
+  -n, --num-electrons=    Field around how many electrons do you want to plot?
+  -I, --file=             Overrides -n option. Plots whatever is in the file specified.
+  -C, --color=            Color of dots which represent electrons. Default is green.
+                          Possible colors are: red, black, green, magenta, blue, yellow.
+  -3, --3d                Create 3d plot. Only quiver plot can be drawn in 3d.
+  -2, --2d                Create 2d plots. (default)
+  -c, --contour           Create contour plot.
+  -s, --streamplot        Create streamplot.
+                          You can only pick one of -c, -q, -s.
+  -S, --no-square         Don't draw square conductor on which electrons lay.
+  -B, --big               If set, the dots which represent electrons will be bigger.
+"""
+
+# Defaults.
+no_electrons = False
+override_file = False
+plot3d = False
+draw_contour = False
+draw_streamplot = True
+draw_square = True
+big_electrons = False
+electron_color = 'green'
+bool_help = False
+
+try:
+    for optarg in optlist:
+        if optarg[0] == '-n' or optarg[0] == '--num-electrons':
+            no_electrons = int(optarg[1])
+        elif optarg[0] == '-I' or optarg[0] == '--file':
+            override_file = optarg[1]
+        elif optarg[0] == '-C' or optarg[0] == '--color':
+            electron_color = optarg[1]
+        elif optarg[0] == '-3' or optarg[0] == '--3d':
+            plot3d = True
+        elif optarg[0] == '-2' or optarg[0] == '--2d':
+            plot3d = False
+        elif optarg[0] == '-c' or optarg[0] == '--contour':
+            draw_contour = True
+            draw_quiver = False
+            draw_streamplot = False
+        elif optarg[0] == '-s' or optarg[0] == '--streamplot':
+            draw_streamplot = True
+            draw_quiver = False
+            draw_contour = False
+        elif optarg[0] == '-S' or optarg[0] == '--no-square':
+            draw_square = False
+        elif optarg[0] == '-B' or optarg[0] == '--big':
+            big_electrons = True
+        elif optarg[0] == '-h' or optarg[0] == '--help':
+            print(help_string)
+            bool_help = True
+except:
+    # No exceptions here, because we like to play it risky.
+    print("You messed something up with arguments.")
+    exit()  # Force exit.
+
+if bool_help:  # Force quit if user asked for help.
+    exit()
+
+# Get plotting
+# Get positions of electrons.
+list_electrons = []
+if override_file:
+    with open('./' + override_file, 'r') as dat:
+        for line in dat:
+            list_electrons.append([float(i) for i in line[:-1].split()])
+else:
+    try:
+        with open('./data/stored-states/{0}-electrons/stored-state-{0}.txt'.format(no_electrons), 'r') as dat:
+            for line in dat:
+                list_electrons.append([float(i) for i in line[:-1].split()])
+    except:
+        print("ERROR: Cannot read file.")
+        print("Might be that you haven't yet run the simulation with {} electrons".format(no_electrons))
+        print("Or maybe you did, but you ran it without saving the equillibrium state")
+        print("Try running it without -s option the next time.")
+
+
+def field_at_point_3d(x, y, z, list_electrons):
+    # Returns tuple of x,y and z components
+    # of electric field at point x, y, z.
+
+    field_x = 0
+    field_y = 0
+    field_z = 0
+
+    def razdalja(x, y, z, electron):
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        delta_z = z
+        return (delta_x**2 + delta_y**2 + delta_z**2)**0.5
+
+    for electron in list_electrons:
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        delta_z = z
+        field_x += delta_x / razdalja(x, y, z, electron)**3 / 300
+        field_y += delta_y / razdalja(x, y, z, electron)**3 / 300
+        field_z += delta_z / razdalja(x, y, z, electron)**3 / 300
+
+    # Minuses because electrons hold negative charge.
+    return -field_x, -field_y, -field_z
+
+
+def potential_3d(x, y, z, list_electrons):
+    # Returns potential energy at point x, y
+
+    def razdalja(x, y, electron):
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        delta_z = z
+        return (delta_x**2 + delta_y**2 + delta_z**2)**0.5
+
+    potential = 0
+
+    for electron in list_electrons:
+        potential += -1/razdalja(x, y, z, electron)
+
+    return potential
+
+
+def field_at_point_2d(x, y, list_electrons):
+    # Returns tuple of x,y components
+    # of electric field at point x, y.
+
+    field_x = 0
+    field_y = 0
+
+    def razdalja(x, y, electron):
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        return (delta_x**2 + delta_y**2)**0.5
+
+    for electron in list_electrons:
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        field_x += delta_x / razdalja(x, y, electron)**3 / 300
+        field_y += delta_y / razdalja(x, y, electron)**3 / 300
+
+    # Minuses because electrons hold negative charge.
+    return -field_x, -field_y
+
+
+def potential_2d(x, y, list_electrons):
+    # Returns potential energy at point x, y
+
+    def razdalja(x, y, electron):
+        delta_x = x - electron[0]
+        delta_y = y - electron[1]
+        return (delta_x**2 + delta_y**2)**0.5
+
+    potential = 0
+
+    for electron in list_electrons:
+        potential += -1/razdalja(x, y, electron)
+
+    return potential
+
+
+color_dict = {
+            'yellow': 'y',
+            'black': 'k',
+            'blue': 'b',
+            'green': 'g',
+            'red': 'r',
+            'orange': 'o'}
+
+if plot3d:
+    x = np.linspace(-0.6, 0.6, 8)
+    y = np.linspace(-0.6, 0.6, 8)
+    z = np.linspace(-0.6, 0.6, 8)
+    X, Y, Z = np.meshgrid(x, y, z)
+    u, v, w = field_at_point_3d(X, Y, Z, list_electrons)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    if draw_square:
+        ax.plot([1, 1, -1, -1, 1], [-1, 1, 1, -1, -1], [0, 0, 0, 0, 0], 'black')
+    ax.quiver(X, Y, Z, u, v, w, normalize=False, length=3)
+    color_size_string = ''
+    if electron_color in [ 'yellow', 'black', 'blue', 'green', 'red', 'orange' ]:
+        color_size_string += color_dict[electron_color]
+    if big_electrons:
+        color_size_string += "o"
+    else:
+        color_size_string += "."
+    ax.plot([i[0] for i in list_electrons],
+            [i[1] for i in list_electrons],
+            [0 for i in list_electrons],
+            color_size_string)
+
+    plt.tick_params(which='both',       # Both major and minor ticks are affected.
+                    bottom=False,       # Ticks along the bottom edge are off.
+                    left=False,         # Ticks along the left edge are off.
+                    labelbottom=False,  # Labels along the bottom edge are off.
+                    labelleft=False)    # Labels along the left edge are off.
+    plt.axis('equal')
+else:  # plot 2d graphs
+    x = np.linspace(-1.3, 1.3, 80)
+    y = np.linspace(-1.3, 1.3, 80)
+    X, Y = np.meshgrid(x, y)
+    u, v = field_at_point_2d(X, Y, list_electrons)
+    Z = potential_2d(X, Y, list_electrons)
+    color_size_string = ''
+    if electron_color in [ 'yellow', 'black', 'blue', 'green', 'red', 'orange' ]:
+        color_size_string += color_dict[electron_color]
+    if big_electrons:
+        color_size_string += "o"
+    else:
+        color_size_string += "."
+    if draw_square:
+        plt.plot([1, 1, -1, -1, 1], [-1, 1, 1, -1, -1], 'black')
+    plt.plot([i[0] for i in list_electrons],
+            [i[1] for i in list_electrons],
+            'go')
+    if draw_streamplot:
+        color = 2*np.log(np.hypot(u, v))
+        plt.streamplot(x, y, u, v, color=color,
+                    density=2, arrowstyle='->', cmap=plt.cm.inferno)
+    if draw_contour:
+        plt.contour(X, Y, Z, 20, density=3)
+    plt.plot([i[0] for i in list_electrons],
+            [i[1] for i in list_electrons],
+            'go')
+    plt.tick_params(which='both',       # Both major and minor ticks are affected.
+                    bottom=False,       # Ticks along the bottom edge are off.
+                    left=False,         # Ticks along the left edge are off.
+                    labelbottom=False,  # Labels along the bottom edge are off.
+                    labelleft=False)    # Labels along the left edge are off.
+    plt.title('Slika 3.2', fontsize=16)
+    plt.axis('equal')
+
+plt.show()
