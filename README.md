@@ -20,5 +20,5 @@ $ convert -delay 4 -loop 0 *.png ../../../gifs/dance.gif
 
 ![Simulation of 11 electrons](data/gifs/dance-11.gif)
 
-Option `-s` will save the last step in a simulation (equillibrium state if the simulation ran for long enough) to a file
-for further analysis later.
+By default, the last step in the simulation (the equillibrium state) will be saved to a file so a further analysis can be done.
+To prevent this, execute electron-dance with option `-s` or `--no-save-state`.
