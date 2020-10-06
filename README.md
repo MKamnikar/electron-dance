@@ -22,3 +22,17 @@ $ convert -delay 4 -loop 0 *.png ../../../gifs/dance.gif
 
 By default, the last step in the simulation (the equillibrium state) will be saved to a file so a further analysis can be done.
 To prevent this, execute electron-dance with option `-s` or `--no-save-state`.
+
+Alongside **electron-dance**, there is another script. A plotter called **draw-plots**, with which you too can draw
+beautiful 3D or 2D plots! Streamplots, contour plots or even 3D quiver plots! Enter following line to draw streamplot below
+
+```
+$ ./draw-plots --number=44 --streamplot --color=cyan --big
+```
+
+![streamplot](./fig-44el-2d-stream-cyan.png)
+
+Or execute this `./draw-plots -n 44 -B -3 -C red` to draw a 3D plot representing electric field inside the square.
+
+![quiver](./fig-44el-3d-quiver-red.png)
+
