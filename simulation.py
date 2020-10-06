@@ -143,10 +143,9 @@ def introduce_perturbations(list_electrons):
                                      list_electrons[i].y))
 
     # Make sure electrons are sufficiently perturbed.
-    if not limit_function(list_electrons, new_list):
-        return introduce_perturbations(new_list)
-    else:
-        return new_list
+    while limit_function(list_electrons, new_list):
+        new_list = introduce_perturbations(new_list)
+    return new_list
 
 
 def save_image(list_electrons, step):
