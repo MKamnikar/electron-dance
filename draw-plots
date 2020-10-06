@@ -34,7 +34,7 @@ Arguments:
   -n, --num-electrons=    Field around how many electrons do you want to plot?
   -I, --file=             Overrides -n option. Plots whatever is in the file specified.
   -C, --color=            Color of dots which represent electrons. Default is green.
-                          Possible colors are: red, black, green, magenta, blue, yellow.
+                          Possible colors are: blue, green, red, cyan, magenta, yellow, black, white
   -3, --3d                Create 3d plot. Only quiver plot can be drawn in 3d.
   -2, --2d                Create 2d plots. (default)
   -c, --contour           Create contour plot.
@@ -191,12 +191,14 @@ def potential_2d(x, y, list_electrons):
 
 
 color_dict = {
-            'yellow': 'y',
-            'black': 'k',
-            'blue': 'b',
-            'green': 'g',
-            'red': 'r',
-            'orange': 'o'}
+    'blue'    : 'b',
+    'green'   : 'g',
+    'red'     : 'r',
+    'cyan'    : 'c',
+    'magenta' : 'm',
+    'yellow'  : 'y',
+    'black'   : 'k',
+    'white'   : 'w'}
 
 if plot3d:
     x = np.linspace(-0.6, 0.6, 8)
@@ -211,7 +213,7 @@ if plot3d:
         ax.plot([1, 1, -1, -1, 1], [-1, 1, 1, -1, -1], [0, 0, 0, 0, 0], 'black')
     ax.quiver(X, Y, Z, u, v, w, normalize=False, length=3)
     color_size_string = ''
-    if electron_color in [ 'yellow', 'black', 'blue', 'green', 'red', 'orange' ]:
+    if electron_color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white']:
         color_size_string += color_dict[electron_color]
     if big_electrons:
         color_size_string += "o"
@@ -235,7 +237,7 @@ else:  # plot 2d graphs
     u, v = field_at_point_2d(X, Y, list_electrons)
     Z = potential_2d(X, Y, list_electrons)
     color_size_string = ''
-    if electron_color in [ 'yellow', 'black', 'blue', 'green', 'red', 'orange' ]:
+    if electron_color in ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black', 'white']:
         color_size_string += color_dict[electron_color]
     if big_electrons:
         color_size_string += "o"
@@ -245,22 +247,18 @@ else:  # plot 2d graphs
         plt.plot([1, 1, -1, -1, 1], [-1, 1, 1, -1, -1], 'black')
     plt.plot([i[0] for i in list_electrons],
             [i[1] for i in list_electrons],
-            'go')
+            color_size_string)
     if draw_streamplot:
         color = 2*np.log(np.hypot(u, v))
         plt.streamplot(x, y, u, v, color=color,
                     density=2, arrowstyle='->', cmap=plt.cm.inferno)
     if draw_contour:
         plt.contour(X, Y, Z, 20, density=3)
-    plt.plot([i[0] for i in list_electrons],
-            [i[1] for i in list_electrons],
-            'go')
     plt.tick_params(which='both',       # Both major and minor ticks are affected.
                     bottom=False,       # Ticks along the bottom edge are off.
                     left=False,         # Ticks along the left edge are off.
                     labelbottom=False,  # Labels along the bottom edge are off.
                     labelleft=False)    # Labels along the left edge are off.
-    plt.title('Slika 3.2', fontsize=16)
     plt.axis('equal')
 
 plt.show()
