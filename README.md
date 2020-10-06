@@ -1,6 +1,7 @@
 # electron-dance
 
-**electron-dance** is a physics simulation of n charged particles constrained to a square conductor.
+**electron-dance** is a physics simulation of n charged particles constrained to a square conductor. It was written for an assignment
+given at a mathematical physics class.
 
 The simulation starts with electrons distributed with uniform angle over the square conductor and runs either until
 reaching the value of `max-steps` or when two successive simulation steps differ by less than a predefined margin.
