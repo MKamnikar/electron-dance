@@ -5,7 +5,7 @@ import sys
 
 # Command line arguments.
 args = sys.argv[1:]  # Ignore script filename.
-optlist = getopt.getopt(args, 'n:m:isphg', ['num-electrons=', 'max-steps=', 'images', 'save-state', 'plot', 'help', 'gif'])[0]
+optlist = getopt.getopt(args, 'n:m:isphg', ['num-electrons=', 'max-steps=', 'images', 'no-save-state', 'plot', 'help', 'gif'])[0]
 help_string = """
 Usage: electron-dance [OPTIONS]
 Simulaties specified number of electrons settling into their equillibrium
@@ -17,7 +17,7 @@ Arguments:
   -m, --max-steps=        Cuts the simulation short when it reaches specified
                           number of steps.
   -i, --images            If set, saves images of simulation at each time step.
-  -s, --save-state        Saves the coordinates of equillibrium state for
+  -s, --no-save-state        Doesn't save the coordinates of equillibrium state for
                           further analysis.
   -p, --plot              Plots starting and equillibrium states.
   -g, --gif               Creates a gif of simulation. Also stores images.
@@ -27,7 +27,7 @@ Arguments:
 no_electrons = 1
 max_steps = 600
 store_images = False
-save_state = False
+save_state = True
 create_plots = False
 create_gif = False
 bool_help = False
@@ -40,8 +40,8 @@ try:
             max_steps = int(optarg[1])
         elif optarg[0] == '-i' or optarg[0] == '--images':
             store_images = True
-        elif optarg[0] == '-s' or optarg[0] == '--save-state':
-            save_state = True
+        elif optarg[0] == '-s' or optarg[0] == '--no-save-state':
+            save_state = False
         elif optarg[0] == '-p' or optarg[0] == '--plot':
             create_plots = True
         elif optarg[0] == '-g' or optarg[0] == '--gif':
